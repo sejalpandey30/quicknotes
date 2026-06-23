@@ -258,7 +258,7 @@ export default function Home() {
               Sign in with Google
             </button>
           </div>
-        ) : (
+        ) : user ? (
           <div className="space-y-6">
             <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
