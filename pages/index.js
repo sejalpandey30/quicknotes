@@ -13,15 +13,19 @@ export default function Home() {
     let authSubscription = null;
 
     async function initializeAuth() {
+      const sessionFromUrl = await supabase.auth.getSessionFromUrl({ storeSession: true });
+      const sessionResult = sessionFromUrl?.data?.session;
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      setUser(session?.user ?? null);
+      const activeSession = sessionResult || session;
+      setUser(activeSession?.user ?? null);
       setAuthLoading(false);
 
-      if (session?.user) {
-        fetchNotes(session.user.id);
+      if (activeSession?.user) {
+        fetchNotes(activeSession.user.id);
       }
     }
 
