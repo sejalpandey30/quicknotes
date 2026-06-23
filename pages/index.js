@@ -222,7 +222,7 @@ export default function Home() {
           </div>
         ) : null}
 
-        {!user ? (
+        {!user && AUTH_ENABLED ? (
           <div className="space-y-5 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-8 text-center">
             <p className="text-slate-700">To keep notes separated by user, please sign in with Google.</p>
             <button
