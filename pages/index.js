@@ -13,19 +13,42 @@ export default function Home() {
     let authSubscription = null;
 
     async function initializeAuth() {
-      const sessionFromUrl = await supabase.auth.getSessionFromUrl({ storeSession: true });
-      const sessionResult = sessionFromUrl?.data?.session;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasAuthParams = urlParams.has("code") || urlParams.has("error") || urlParams.has("state") || urlParams.has("sb");
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        if (hasAuthParams) {
+          const {
+            data: { session: callbackSession },
+            error: callbackError,
+          } = await supabase.auth.getSessionFromUrl({ storeSession: true });
 
-      const activeSession = sessionResult || session;
-      setUser(activeSession?.user ?? null);
-      setAuthLoading(false);
+          if (callbackError) {
+            setError(callbackError.message || "Authentication callback failed.");
+          }
 
-      if (activeSession?.user) {
-        fetchNotes(activeSession.user.id);
+          if (callbackSession?.user) {
+            setUser(callbackSession.user);
+            await fetchNotes(callbackSession.user.id);
+          }
+
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await fetchNotes(session.user.id);
+        }
+      } catch (initializationError) {
+        console.error("Authentication initialization failed:", initializationError);
+        setError("Unable to initialize authentication.");
+      } finally {
+        setAuthLoading(false);
       }
     }
 
