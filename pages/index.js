@@ -14,6 +14,10 @@ export default function Home() {
 
     async function initializeAuth() {
       try {
+        if (!supabase) {
+          throw new Error("Supabase client is not initialized. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const hasAuthParams = urlParams.has("code") || urlParams.has("error") || urlParams.has("state") || urlParams.has("sb");
 
@@ -25,6 +29,7 @@ export default function Home() {
 
           if (callbackError) {
             setError(callbackError.message || "Authentication callback failed.");
+            console.error("Supabase callback error:", callbackError);
           }
 
           if (callbackSession?.user) {
@@ -37,7 +42,12 @@ export default function Home() {
 
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          throw sessionError;
+        }
 
         setUser(session?.user ?? null);
 
@@ -46,7 +56,11 @@ export default function Home() {
         }
       } catch (initializationError) {
         console.error("Authentication initialization failed:", initializationError);
-        setError("Unable to initialize authentication.");
+        setError(
+          initializationError?.message ||
+          (initializationError?.error && initializationError.error.message) ||
+          "Unable to initialize authentication."
+        );
       } finally {
         setAuthLoading(false);
       }
