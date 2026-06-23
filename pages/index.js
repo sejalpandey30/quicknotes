@@ -68,19 +68,21 @@ export default function Home() {
 
     initializeAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
+    if (supabase) {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        setUser(session?.user ?? null);
 
-      if (session?.user) {
-        await fetchNotes(session.user.id);
-      } else {
-        setNotes([]);
-      }
-    });
+        if (session?.user) {
+          await fetchNotes(session.user.id);
+        } else {
+          setNotes([]);
+        }
+      });
 
-    authSubscription = subscription;
+      authSubscription = subscription;
+    }
 
     return () => {
       authSubscription?.unsubscribe();
@@ -90,6 +92,12 @@ export default function Home() {
   async function fetchNotes(userId) {
     setLoading(true);
     setError("");
+
+    if (!supabase) {
+      setError("Supabase client is not initialized. Cannot load notes.");
+      setLoading(false);
+      return;
+    }
 
     const query = supabase.from("notes").select("id, content, created_at").order("created_at", { ascending: false });
 
@@ -130,6 +138,12 @@ export default function Home() {
       notePayload.user_id = user.id;
     }
 
+    if (!supabase) {
+      setError("Supabase client is not initialized. Cannot add note.");
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.from("notes").insert(notePayload);
 
     if (error) {
@@ -151,6 +165,12 @@ export default function Home() {
     setLoading(true);
     setError("");
 
+    if (!supabase) {
+      setError("Supabase client is not initialized. Cannot delete note.");
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.from("notes").delete().eq("id", id);
 
     if (error) {
@@ -164,6 +184,11 @@ export default function Home() {
   }
 
   async function signInWithGoogle() {
+    if (!supabase) {
+      setError("Supabase client is not initialized. Cannot start Google sign-in.");
+      return;
+    }
+
     setError("");
 
     const { error } = await supabase.auth.signInWithOAuth({
