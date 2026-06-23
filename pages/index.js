@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import supabase from "../lib/supabaseClient";
 
 export default function Home() {
-  const AUTH_ENABLED = process.env.NEXT_PUBLIC_AUTH_ENABLED !== "false";
+  const AUTH_ENABLED = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true";
+  const FALLBACK_USER_ID = "public";
 
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
@@ -18,8 +19,8 @@ export default function Home() {
       try {
         if (!AUTH_ENABLED) {
           // Provide a shared fallback user for cloud-only deployments
-          setUser({ id: "public", email: "public@local" });
-          await fetchNotes("public");
+          setUser({ id: FALLBACK_USER_ID, email: "public@local" });
+          await fetchNotes(FALLBACK_USER_ID);
           setAuthLoading(false);
           return;
         }
@@ -90,20 +91,21 @@ export default function Home() {
     setLoading(true);
     setError("");
 
-    if (!userId) {
-      setNotes([]);
-      setLoading(false);
-      return;
+    const query = supabase.from("notes").select("id, content, created_at").order("created_at", { ascending: false });
+
+    if (AUTH_ENABLED) {
+      if (!userId) {
+        setNotes([]);
+        setLoading(false);
+        return;
+      }
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await supabase
-      .from("notes")
-      .select("id, content, created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+    const { data, error } = await query;
 
     if (error) {
-      setError("Unable to load notes. Make sure your notes table has a user_id column.");
+      setError(`Unable to load notes. ${error.message}`);
       console.error(error);
     } else {
       setNotes(data || []);
@@ -120,17 +122,22 @@ export default function Home() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.from("notes").insert({
+    const notePayload = {
       content: newNote.trim(),
-      user_id: user.id,
-    });
+    };
+
+    if (AUTH_ENABLED) {
+      notePayload.user_id = user.id;
+    }
+
+    const { error } = await supabase.from("notes").insert(notePayload);
 
     if (error) {
       setError("Unable to add note.");
       console.error(error);
     } else {
       setNewNote("");
-      fetchNotes(user.id);
+      fetchNotes(AUTH_ENABLED ? user.id : FALLBACK_USER_ID);
     }
 
     setLoading(false);
