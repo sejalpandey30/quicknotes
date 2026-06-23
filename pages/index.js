@@ -21,22 +21,12 @@ export default function Home() {
         const urlParams = new URLSearchParams(window.location.search);
         const hasAuthParams = urlParams.has("code") || urlParams.has("error") || urlParams.has("state") || urlParams.has("sb");
 
+        const { error: initError } = await supabase.auth.initialize();
+        if (initError) {
+          throw initError;
+        }
+
         if (hasAuthParams) {
-          const {
-            data: { session: callbackSession },
-            error: callbackError,
-          } = await supabase.auth.getSessionFromUrl({ storeSession: true });
-
-          if (callbackError) {
-            setError(callbackError.message || "Authentication callback failed.");
-            console.error("Supabase callback error:", callbackError);
-          }
-
-          if (callbackSession?.user) {
-            setUser(callbackSession.user);
-            await fetchNotes(callbackSession.user.id);
-          }
-
           window.history.replaceState({}, document.title, window.location.pathname);
         }
 
