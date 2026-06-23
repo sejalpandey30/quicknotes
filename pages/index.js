@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import supabase from "../lib/supabaseClient";
 
 export default function Home() {
+  const AUTH_ENABLED = process.env.NEXT_PUBLIC_AUTH_ENABLED !== "false";
+
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,6 +16,13 @@ export default function Home() {
 
     async function initializeAuth() {
       try {
+        if (!AUTH_ENABLED) {
+          // Provide a shared fallback user for cloud-only deployments
+          setUser({ id: "public", email: "public@local" });
+          await fetchNotes("public");
+          setAuthLoading(false);
+          return;
+        }
         if (!supabase) {
           throw new Error("Supabase client is not initialized. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
         }
@@ -191,10 +200,12 @@ export default function Home() {
         <header className="mb-8 text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Quick Notes</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-900">
-            Notes by Google sign-in
+            {AUTH_ENABLED ? "Notes by Google sign-in" : "Notes (authentication disabled)"}
           </h1>
           <p className="mt-3 text-slate-600">
-            Sign in with Google to manage your personal notes.
+            {AUTH_ENABLED
+              ? "Sign in with Google to manage your personal notes."
+              : "Authentication is disabled — notes are shared for this deployment."}
           </p>
         </header>
 
