@@ -1,24 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# 📝 QuickNotes
 
-First, run the development server:
+A minimal notes app built with **Next.js** (frontend) and **Supabase** (backend), deployed on **Vercel**.  
+QuickNotes lets you add, view, and delete notes in a clean, simple interface.
 
+---
+
+## 🚀 Features
+- Add new notes
+- View all saved notes
+- Delete notes
+- Supabase Postgres database integration
+- Deployed with Vercel (auto‑redeploy on GitHub push)
+
+---
+
+## 🛠️ Tech Stack
+- **Frontend**: Next.js + React + Tailwind CSS
+- **Backend**: Supabase (Postgres + Auth)
+- **Deployment**: Vercel
+- **Version Control**: GitHub
+
+---
+
+## 📦 Installation
+
+Clone the repo:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/sejalpandey30/quicknotes.git
+cd quicknotes
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Run locally:
+```bash
+npm run dev
+```
+App runs at `http://localhost:3000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
+
+## 🔑 Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+---
+
+## 🗄️ Database Setup
+
+In Supabase SQL Editor, create the `notes` table:
+
+```sql
+create table notes (
+  id uuid primary key default uuid_generate_v4(),
+  content text not null,
+  created_at timestamp default now()
+);
+```
+
+---
+
+## 🚀 Deployment
+
+1. Push code to GitHub.
+2. Connect repo to Vercel.
+3. Add environment variables in Vercel project settings.
+4. Deploy → your app will be live at `https://quicknotes.vercel.app`.
+
+---
+
+## 🔄 Updating the App
+
+- Make changes locally → commit → push to GitHub.  
+- Vercel automatically redeploys with the new changes.  
+- Use feature branches for preview deployments.
+
+---
+
+## 📸 Demo
+
+Visit the live app: [QuickNotes on Vercel](https://quicknotes-blue.vercel.app)
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, open an issue first to discuss what you’d like to change.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+
+
 
 ## Learn More
 
