@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f4ea;
+  --foreground: #181512;
 }
 
 @theme inline {
@@ -12,34 +12,126 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.animated-grid {
+button,
+textarea {
+  font: inherit;
+}
+
+.dropnote-theme {
+  --ink: #181512;
+  --reverse: #fffaf0;
+  --muted: #6f665c;
+  --muted-soft: #a1968a;
+  --surface: rgba(255, 252, 245, 0.86);
+  --surface-soft: rgba(255, 255, 255, 0.66);
+  --surface-strong: #ffffff;
+  --field: #fff9eb;
+  --line: rgba(24, 21, 18, 0.12);
+  --line-strong: rgba(24, 21, 18, 0.24);
+  --shadow: rgba(64, 50, 38, 0.16);
+  --accent: #ff5d8f;
+  --accent-two: #14b8a6;
+  --focus: rgba(20, 184, 166, 0.26);
+  --mint: #c8f5e7;
+  --sun: #ffe1a6;
+  --pill: #181512;
+  --pill-text: #fffaf0;
+  --disabled: #a8a29e;
+  background: var(--background);
+}
+
+.dropnote-theme[data-theme="night"] {
+  --ink: #f8f4ea;
+  --reverse: #121017;
+  --muted: #b9afa3;
+  --muted-soft: #80776f;
+  --surface: rgba(24, 22, 31, 0.82);
+  --surface-soft: rgba(35, 31, 45, 0.68);
+  --surface-strong: #211d2a;
+  --field: #17131f;
+  --line: rgba(248, 244, 234, 0.14);
+  --line-strong: rgba(248, 244, 234, 0.3);
+  --shadow: rgba(0, 0, 0, 0.34);
+  --accent: #38bdf8;
+  --accent-two: #f472b6;
+  --focus: rgba(56, 189, 248, 0.26);
+  --mint: #123f3c;
+  --sun: #463715;
+  --pill: #f8f4ea;
+  --pill-text: #121017;
+  --disabled: #57534e;
+  background: #121017;
+}
+
+.theme-canvas {
   background:
-    linear-gradient(90deg, rgba(41, 37, 36, 0.055) 1px, transparent 1px),
-    linear-gradient(rgba(41, 37, 36, 0.055) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(244, 63, 94, 0.16) 0 12%, transparent 12% 100%),
-    linear-gradient(45deg, transparent 0 78%, rgba(6, 182, 212, 0.18) 78% 88%, transparent 88% 100%),
+    linear-gradient(90deg, rgba(120, 113, 108, 0.11) 1px, transparent 1px),
+    linear-gradient(rgba(120, 113, 108, 0.11) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 93, 143, 0.16) 0 10%, transparent 10% 100%),
+    linear-gradient(45deg, transparent 0 76%, rgba(20, 184, 166, 0.18) 76% 88%, transparent 88% 100%),
     linear-gradient(160deg, transparent 0 58%, rgba(245, 158, 11, 0.16) 58% 70%, transparent 70% 100%),
-    #f7f3ea;
+    var(--background);
   background-size:
-    36px 36px,
-    36px 36px,
+    34px 34px,
+    34px 34px,
     auto,
     auto,
     auto,
     auto;
+  transition:
+    background 280ms ease,
+    color 280ms ease;
+}
+
+[data-theme="night"] .theme-canvas {
+  background:
+    linear-gradient(90deg, rgba(248, 244, 234, 0.07) 1px, transparent 1px),
+    linear-gradient(rgba(248, 244, 234, 0.07) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0 10%, transparent 10% 100%),
+    linear-gradient(45deg, transparent 0 76%, rgba(244, 114, 182, 0.16) 76% 88%, transparent 88% 100%),
+    linear-gradient(160deg, transparent 0 58%, rgba(45, 212, 191, 0.12) 58% 70%, transparent 70% 100%),
+    #121017;
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto,
+    auto,
+    auto,
+    auto;
+}
+
+.metric-card {
+  min-height: 112px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 12px 30px var(--shadow);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-strong);
+  box-shadow: 0 16px 34px var(--shadow);
 }
 
 .fade-up {
@@ -63,12 +155,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
 }
